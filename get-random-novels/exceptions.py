@@ -1,0 +1,2 @@
+class InvalidESDocumentError(Exception):
+    pass
