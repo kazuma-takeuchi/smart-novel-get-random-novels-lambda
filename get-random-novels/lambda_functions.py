@@ -14,6 +14,7 @@ from exceptions import InvalidESDocumentError
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+NG_WORDS = ["エロ", "R18", "R15", "えちえち", "エッチ", "BL", "ロリ"]
 ES_INDEX_NAME = os.getenv('ES_INDEX_NAME')
 
 def err(status_code: int, err_reason):
@@ -26,13 +27,29 @@ def err(status_code: int, err_reason):
 
 def execute_search(es, params: Dict):
     limit = params['limit']
-    response = es.search(index=ES_INDEX_NAME, size=limit, body={"query": {"match_all": {}},  "sort": {
-           "_script" : {
-             "script" : "Math.random()",
-             # "lang" : "groovy",
-             "type" : "number"
-           }
-         }
+    response = es.search(
+        index=ES_INDEX_NAME, 
+        size=limit, 
+        body={
+            "query": {
+                "bool": {
+                    "must": [
+                        {"bool": {"must_not": {"terms": {"description": NG_WORDS}}}},
+                        {"bool": {"must_not": {"terms": {"title": NG_WORDS}}}}
+                    ],
+                    "filter": [
+                        {"bool": {"must_not": {"term": {"genre": "BL"}}}},
+                        {"bool": {"must_not": {"terms": {"tag": ["R15", "R18"]}}}}
+                    ]
+                }
+            },
+            "sort": {
+                "_script" : {
+                    "script" : "Math.random()",
+                    # "lang" : "groovy",
+                    "type" : "number"
+                }
+            }
         })
     return response
 
