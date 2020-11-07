@@ -35,11 +35,11 @@ def execute_search(es, params: Dict):
                 "bool": {
                     "must": [
                         {"bool": {"must_not": {"terms": {"description": NG_WORDS}}}},
-                        {"bool": {"must_not": {"terms": {"title": NG_WORDS}}}}
+                        {"bool": {"must_not": {"terms": {"genre": NG_WORDS}}}},
                     ],
                     "filter": [
-                        {"bool": {"must_not": {"term": {"genre": "BL"}}}},
-                        {"bool": {"must_not": {"terms": {"tag": ["R15", "R18"]}}}}
+                        {"bool": {"must_not": {"terms": {"genre": NG_WORDS}}}},
+                        {"bool": {"must_not": {"terms": {"tag": [NG_WORDS}}}}
                     ]
                 }
             },
